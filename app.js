@@ -27,14 +27,18 @@ let logs = [];
 // --- Utilities ---
 async function fetchLogs() {
     try {
-        const q = query(logsCollection, orderBy("date", "desc"), orderBy("time", "desc"));
+        // Disederhanakan menjadi satu orderBy saja untuk menghindari error "Composite Index Required"
+        const q = query(logsCollection, orderBy("date", "desc"));
         const querySnapshot = await getDocs(q);
         logs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("Data berhasil diambil:", logs.length, "records");
         render();
     } catch (error) {
         console.error("Error fetching logs: ", error);
-        // Fallback to local storage if needed or show error
+        // Tunjukkan link error index jika ada di console
+        showToast("Gagal memuat data. Cek console browser untuk link pembuatan index.");
         logs = JSON.parse(localStorage.getItem('jurnal_kegiatan_logs')) || [];
+        render();
     }
 }
 
