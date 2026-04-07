@@ -51,36 +51,41 @@
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32 font-body overflow-x-hidden">
     <!-- Top Bar -->
-    <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-surface-container">
+    <header class="fixed top-0 w-full z-50 glass border-b border-surface-container">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-2xl mx-auto">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-primary/20">
-                    <span class="material-symbols-outlined text-primary-dim">person</span>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center overflow-hidden shadow-sm">
+                    <span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">edit_note</span>
                 </div>
-                <h1 class="font-headline font-bold text-lg text-on-surface">Jurnal Kegiatan</h1>
+                <div>
+                    <h1 class="font-headline font-extrabold text-lg text-on-surface leading-tight tracking-tight">Jurnal Kegiatan</h1>
+                    <p class="text-[10px] text-outline font-bold uppercase tracking-widest">Digital Logbook</p>
+                </div>
             </div>
-            <button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container" id="settings-btn">settings</button>
+            <button class="material-symbols-outlined text-outline hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container active:scale-95" id="settings-btn" title="Pengaturan">settings</button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main id="app-content" class="pt-24 px-6 max-w-2xl mx-auto min-h-screen">
-        <!-- Views will be injected here by app.js -->
+    <!-- Main Content Shell -->
+    <main class="pt-24 px-6 max-w-2xl mx-auto min-h-screen relative">
+        <div id="app-content">
+            <!-- Views will be injected here by app.js -->
+        </div>
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-white/80 backdrop-blur-xl border-t border-surface-container rounded-t-[2.5rem] shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
-        <button class="nav-item flex flex-col items-center justify-center transition-all duration-300" data-view="dashboard">
-            <span class="material-symbols-outlined mb-1">home</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider">Beranda</span>
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 pb-10 pt-4 glass border-t border-surface-container rounded-t-[2.5rem] shadow-[0_-12px_40px_rgba(0,0,0,0.06)]">
+        <button class="nav-item flex flex-col items-center justify-center transition-all duration-300 active" data-view="dashboard" id="nav-dashboard">
+            <span class="material-symbols-outlined mb-1">team_dashboard</span>
+            <span class="text-[9px] font-extrabold uppercase tracking-widest">Beranda</span>
         </button>
-        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="riwayat">
-            <span class="material-symbols-outlined mb-1">history</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider">Riwayat</span>
+        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="riwayat" id="nav-riwayat">
+            <span class="material-symbols-outlined mb-1">history_edu</span>
+            <span class="text-[9px] font-extrabold uppercase tracking-widest">Riwayat</span>
         </button>
-        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="laporan">
+        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="laporan" id="nav-laporan">
             <span class="material-symbols-outlined mb-1">analytics</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider">Laporan</span>
+            <span class="text-[9px] font-extrabold uppercase tracking-widest">Laporan</span>
         </button>
     </nav>
 

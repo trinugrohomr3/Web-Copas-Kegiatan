@@ -1,38 +1,120 @@
 :root {
     --primary: #87CEEB;
+    --primary-dim: #5FB6D9;
+    --primary-container: #E3F2FD;
+    --surface: #FFFFFF;
+    --surface-container: #F1F5F9;
+    --outline: #94A3B8;
+    --text-main: #1E293B;
+    --text-dim: #475569;
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
 }
 
 body {
-    -webkit-tap-highlight-color: transparent;
+    background-color: var(--surface);
+    color: var(--text-main);
+    font-family: 'Manrope', sans-serif;
+    transition: background-color 0.3s ease;
 }
 
-.material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+/* Glassmorphism Refined */
+.glass {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-top { 
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.glass-bottom { 
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-top: 1px solid #F1F5F9;
+}
+
+/* Navigation Active State - Pill Style */
+.nav-item {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item.active {
-    color: var(--primary);
+    color: var(--primary-dim);
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--primary-container);
+    border-radius: 16px;
+    z-index: -1;
+    transform: scale(1.1);
+    animation: pillPop 0.3s ease-out;
+}
+
+@keyframes pillPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1.1); opacity: 1; }
+}
+
+.nav-item .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    transition: font-variation-settings 0.3s;
 }
 
 .nav-item.active .material-symbols-outlined {
-    font-variation-settings: 'FILL' 1;
+    font-variation-settings: 'FILL' 1, 'wght' 500;
 }
 
-/* Page Transitions */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Slide Animations */
+#app-content {
+    position: relative;
+    overflow-x: hidden;
+    width: 100%;
 }
 
-.view-active {
-    animation: fadeIn 0.4s ease-out forwards;
+.slide-in-right {
+    animation: slideInRight 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
-/* Glassmorphism */
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+.slide-in-left {
+    animation: slideInLeft 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slideInRight {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Premium Card Styles */
+.premium-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.premium-card:active {
+    transform: scale(0.98);
 }
 
 /* Custom Scrollbar */
@@ -46,31 +128,9 @@ body {
     background: #E2E8F0;
     border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
-}
 
-/* Form Styles */
-input[type="date"], input[type="time"] {
-    position: relative;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-    background: transparent;
-    bottom: 0;
-    color: transparent;
-    cursor: pointer;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: auto;
-}
-
-/* Toast Animation */
+/* Toast Styles */
 #toast.show {
     opacity: 1;
     transform: translate(-50%, -20px);
-    pointer-events: auto;
 }

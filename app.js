@@ -73,137 +73,151 @@ const templates = {
         const recentLogs = [...logs].sort((a,b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time)).slice(0, 3);
         
         return `
-            <section class="space-y-8 view-active">
-                <!-- Hero Section -->
-                <div class="p-8 rounded-lg bg-primary-container text-on-primary-container shadow-sm border border-primary/10">
-                    <p class="font-headline text-primary-dim font-semibold tracking-wide text-xs uppercase mb-2">Ringkasan Hari Ini</p>
-                    <h2 class="font-headline text-3xl font-extrabold tracking-tight">${todayLogs.length} Aktivitas Tercatat</h2>
-                    <p class="mt-4 text-on-surface-variant/80 font-body text-sm leading-relaxed max-w-xs">Konsistensi Anda membangun fondasi untuk kesuksesan hari esok.</p>
+            <section class="space-y-10">
+                <!-- Welcome/Hero -->
+                <div class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary-container via-white to-primary/5 p-8 border border-white shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-1 rounded-full border border-white mb-4">
+                            <span class="w-1.5 h-1.5 rounded-full bg-primary-dim animate-pulse"></span>
+                            <span class="text-[10px] font-bold text-primary-dim uppercase tracking-widest">Sistem Aktif</span>
+                        </div>
+                        <h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Halo, Selamat Bekerja!</h2>
+                        <p class="text-sm text-outline font-medium max-w-[240px] leading-relaxed">Hari ini ada <span class="text-primary-dim font-bold">${todayLogs.length} kegiatan</span> yang sudah Anda catat.</p>
+                    </div>
+                    <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
                 </div>
 
-                <!-- Primary Action -->
-                <button onclick="navigate('input')" class="w-full flex items-center justify-between p-6 rounded-lg bg-white border border-surface-container hover:border-primary transition-all duration-200 shadow-sm group">
-                    <div class="flex items-center gap-5">
-                        <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-primary-dim group-hover:scale-110 transition-transform">
-                            <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add_notes</span>
+                <!-- Main Action Card -->
+                <div class="premium-card p-2 rounded-[1.8rem] bg-slate-50">
+                    <button onclick="navigate('input')" class="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-white border border-slate-100 hover:border-primary transition-all duration-300 shadow-sm group">
+                        <div class="flex items-center gap-5">
+                            <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary-dim group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                            </div>
+                            <div class="text-left">
+                                <span class="block font-headline font-extrabold text-xl text-on-surface tracking-tight">Catat Baru</span>
+                                <span class="block font-body text-xs text-outline font-medium mt-0.5">Input progres kegiatan Anda</span>
+                            </div>
                         </div>
-                        <div class="text-left">
-                            <span class="block font-headline font-bold text-lg text-on-surface">Log Kegiatan Baru</span>
-                            <span class="block font-body text-xs text-outline">Catat progres Anda sekarang</span>
+                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-white transition-all">
+                            <span class="material-symbols-outlined">arrow_forward</span>
                         </div>
-                    </div>
-                    <span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all">chevron_right</span>
-                </button>
+                    </button>
+                </div>
 
-                <!-- Stats -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-surface-container-low p-6 rounded-lg border border-surface-container/50">
-                        <span class="material-symbols-outlined text-primary-dim mb-2 text-xl">timer</span>
-                        <p class="font-headline font-bold text-2xl text-on-surface">${calculateFocusTime()}</p>
-                        <p class="font-label text-xs text-outline font-medium">Waktu Fokus</p>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="premium-card p-6 rounded-3xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-400">
+                                <span class="material-symbols-outlined text-xl">schedule</span>
+                            </div>
+                        </div>
+                        <p class="font-headline font-black text-3xl text-on-surface tracking-tight">${calculateFocusTime()}</p>
+                        <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Estimasi Kerja</p>
                     </div>
-                    <div class="bg-surface-container-low p-6 rounded-lg border border-surface-container/50">
-                        <span class="material-symbols-outlined text-primary-dim mb-2 text-xl">task_alt</span>
-                        <p class="font-headline font-bold text-2xl text-on-surface">${calculateTargetProgress()}%</p>
-                        <p class="font-label text-xs text-outline font-medium">Target Selesai</p>
+                    <div class="premium-card p-6 rounded-3xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-400">
+                                <span class="material-symbols-outlined text-xl">verified</span>
+                            </div>
+                        </div>
+                        <p class="font-headline font-black text-3xl text-on-surface tracking-tight">${calculateTargetProgress()}%</p>
+                        <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Pencapaian Hari Ini</p>
                     </div>
                 </div>
 
-                <!-- Recent Entries -->
+                <!-- Recent Activities -->
                 <section>
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-headline font-bold text-lg text-on-surface">Aktivitas Terakhir</h3>
-                        <button onclick="navigate('riwayat')" class="text-primary font-semibold text-sm hover:underline">Lihat Semua</button>
+                    <div class="flex items-center justify-between mb-6 px-1">
+                        <h3 class="font-headline font-extrabold text-lg text-on-surface tracking-tight">Log Terakhir</h3>
+                        <button onclick="navigate('riwayat')" class="text-xs font-bold text-primary-dim uppercase tracking-widest border-b-2 border-primary/20 pb-0.5">Semua</button>
                     </div>
                     <div class="space-y-4">
                         ${recentLogs.length ? recentLogs.map(log => `
-                            <div class="flex items-start gap-4 p-5 rounded-lg border border-surface-container/50 bg-white shadow-sm">
-                                <div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-on-surface-variant text-xl">${getIconForCategory(log.category)}</span>
+                            <div class="premium-card flex items-center gap-4 p-4 rounded-2xl hover:border-primary/30 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-on-surface-variant/50 shrink-0">
+                                    <span class="material-symbols-outlined text-2xl">${getIconForCategory(log.category)}</span>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <h4 class="font-headline font-bold text-on-surface text-sm">${log.description.substring(0, 30)}${log.description.length > 30 ? '...' : ''}</h4>
-                                        <span class="font-label text-[10px] text-outline">${log.time}</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-center mb-0.5">
+                                        <h4 class="font-headline font-bold text-on-surface text-sm truncate pr-2">${log.description}</h4>
+                                        <span class="text-[10px] font-bold text-outline whitespace-nowrap">${log.time}</span>
                                     </div>
-                                    <p class="font-body text-xs text-on-surface-variant leading-relaxed">${log.location || 'Tanpa Lokasi'}</p>
+                                    <p class="font-body text-[11px] text-outline truncate">${log.location || 'Sudah di kantor'}</p>
                                 </div>
-                                ${log.photoUrl ? `
-                                    <div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 border border-slate-100">
-                                        <img src="${log.photoUrl}" class="w-full h-full object-cover"/>
-                                    </div>
-                                ` : ''}
                             </div>
-                        `).join('') : '<p class="text-center text-outline py-8">Belum ada aktivitas tercatat.</p>'}
+                        `).join('') : '<p class="text-center text-outline py-8 text-sm italic">Belum ada data...</p>'}
                     </div>
                 </section>
             </section>
         `;
     },
     input: () => `
-        <section class="view-active">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-on-surface mb-1">Catat Kegiatan</h2>
-                <p class="text-outline text-sm">Lengkapi formulir di bawah untuk mencatat jurnal harian Anda.</p>
+        <section class="space-y-10">
+            <div class="flex items-center gap-4">
+                <button onclick="navigate('dashboard')" class="w-10 h-10 rounded-full border border-slate-100 flex items-center justify-center text-outline hover:text-primary transition-all">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-black text-on-surface tracking-tight">Catat Kegiatan</h2>
+                    <p class="text-xs font-bold text-outline uppercase tracking-widest">Detail Baru</p>
+                </div>
             </div>
-            <form id="log-form" class="space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Tanggal</label>
-                        <div class="relative bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-                            <input class="w-full bg-transparent border-none p-0 text-sm font-medium text-on-surface focus:ring-0" type="date" id="input-date" required value="${new Date().toISOString().split('T')[0]}"/>
+
+            <form id="log-form" class="space-y-8">
+                <!-- Group 1: Time & Identity -->
+                <div class="premium-card p-6 rounded-3xl space-y-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">event_available</span>
+                        <h3 class="text-xs font-bold text-on-surface uppercase tracking-widest">Waktu & Kategori</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Tanggal</label>
+                            <input class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/20 transition-all" type="date" id="input-date" required value="${new Date().toISOString().split('T')[0]}"/>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Waktu</label>
+                            <input class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/20 transition-all" type="time" id="input-time" required value="${new Date().toTimeString().split(' ')[0].substring(0, 5)}"/>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Waktu</label>
-                        <div class="relative bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-                            <input class="w-full bg-transparent border-none p-0 text-sm font-medium text-on-surface focus:ring-0" type="time" id="input-time" required value="${new Date().toTimeString().split(' ')[0].substring(0, 5)}"/>
-                        </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Kategori Kegiatan</label>
+                        <select id="input-category" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+                            <option value="Kerja">💼 Pekerjaan Kantor</option>
+                            <option value="Kesehatan">🏥 Kesehatan / Istirahat</option>
+                            <option value="Pribadi">🏠 Urusan Pribadi</option>
+                            <option value="Lainnya">📝 Lain-lain</option>
+                        </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Kategori</label>
-                    <select id="input-category" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm font-medium text-on-surface">
-                        <option value="Kerja">Kerja</option>
-                        <option value="Kesehatan">Kesehatan</option>
-                        <option value="Pribadi">Pribadi</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Lokasi</label>
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-                        <input class="w-full bg-transparent border-none p-0 text-sm font-medium text-on-surface placeholder:text-slate-400 focus:ring-0" placeholder="Contoh: Kantor, Lokasi Klien" type="text" id="input-location"/>
+
+                <!-- Group 2: Context Detail -->
+                <div class="premium-card p-6 rounded-3xl space-y-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-primary text-lg">description</span>
+                        <h3 class="text-xs font-bold text-on-surface uppercase tracking-widest">Detail Progres</h3>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Lokasi</label>
+                        <input class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Misal: Kantor Lt 4, Client Side" type="text" id="input-location"/>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Apa yang dikerjakan?</label>
+                        <textarea class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all resize-none" placeholder="Tuliskan detail pekerjaan Anda..." rows="4" id="input-description" required></textarea>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Deskripsi Kegiatan</label>
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-                                <textarea class="w-full bg-transparent border-none p-0 text-sm font-medium text-on-surface placeholder:text-slate-400 focus:ring-0 resize-none" placeholder="Apa yang Anda kerjakan?" rows="4" id="input-description" required></textarea>
-                            </div>
-                        </div>
-                        <!-- Photo Upload Hidden for now
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Unggah Foto (Opsional)</label>
-                            <div class="relative bg-slate-50 border border-slate-200 rounded-lg px-3 py-4 focus-within:border-primary border-dashed transition-all cursor-pointer group" onclick="document.getElementById('input-photo').click()">
-                                <input type="file" id="input-photo" accept="image/*" class="hidden" onchange="window.handlePhotoPreview(event)"/>
-                                <div id="photo-preview-container" class="hidden w-full aspect-video rounded-lg overflow-hidden border border-slate-200 mb-2 relative">
-                                    <img id="photo-preview" class="w-full h-full object-cover" src=""/>
-                                    <button type="button" onclick="event.stopPropagation(); window.clearPhoto(event)" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors">
-                                        <span class="material-symbols-outlined text-sm">close</span>
-                                    </button>
-                                </div>
-                                <div id="upload-placeholder" class="flex flex-col items-center justify-center py-4 text-outline group-hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-3xl mb-1">add_a_photo</span>
-                                    <span class="text-xs font-bold uppercase tracking-widest">Pilih Foto</span>
-                                </div>
-                            </div>
-                        </div>
-                        -->
-                        <div class="pt-4">
-                    <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary-dim active:scale-95 transition-all">
-                        Simpan
+
+                <div class="pt-6 pb-12">
+                    <button type="submit" class="w-full py-4 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:bg-primary-dim active:scale-95 transition-all">
+                        Simpan Log
                     </button>
-                    <button type="button" onclick="navigate('dashboard')" class="w-full py-4 mt-2 text-outline font-bold text-sm hover:text-on-surface-variant transition-colors">
+                    <button type="button" onclick="navigate('dashboard')" class="w-full py-4 mt-2 text-outline font-bold text-xs uppercase tracking-widest hover:text-on-surface transition-colors">
                         Batal
                     </button>
                 </div>
@@ -368,13 +382,28 @@ function calculateTargetProgress() {
 
 function getIconForCategory(cat) {
     if (cat === 'Kerja') return 'edit_square';
+    if (cat === 'Pekerjaan Kantor') return 'work';
     if (cat === 'Kesehatan') return 'favorite';
     if (cat === 'Pribadi') return 'person';
     return 'list_alt';
 }
 
+let viewOrder = ['dashboard', 'riwayat', 'laporan', 'input'];
+
 function navigate(view) {
+    const oldIndex = viewOrder.indexOf(currentView);
+    const newIndex = viewOrder.indexOf(view);
+    const direction = newIndex > oldIndex ? 'slide-in-right' : 'slide-in-left';
+    
     currentView = view;
+    
+    const appContent = document.getElementById('app-content');
+    
+    // Add transition class
+    appContent.classList.remove('slide-in-right', 'slide-in-left');
+    void appContent.offsetWidth; // Trigger reflow
+    appContent.classList.add(direction);
+    
     render();
     
     // Update nav items
@@ -394,7 +423,7 @@ function navigate(view) {
     // If input view, handle form submission
     if (view === 'input') {
         const form = document.getElementById('log-form');
-        form.addEventListener('submit', handleAddLog);
+        if (form) form.addEventListener('submit', handleAddLog);
     }
 }
 
