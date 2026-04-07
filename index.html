@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Jurnal Kegiatan - Log Aktivitas Harian</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Scripts & Styles -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#87CEEB", // Sky Blue
+                        "primary-dim": "#5FB6D9",
+                        "primary-container": "#E3F2FD",
+                        "on-primary-container": "#01579B",
+                        "surface": "#FFFFFF",
+                        "surface-dim": "#F8FAFC",
+                        "surface-container": "#F1F5F9",
+                        "surface-container-low": "#F8FAFC",
+                        "surface-container-high": "#E2E8F0",
+                        "on-surface": "#1E293B",
+                        "on-surface-variant": "#475569",
+                        "outline": "#94A3B8",
+                        "outline-variant": "#E2E8F0",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32 font-body overflow-x-hidden">
+    <!-- Top Bar -->
+    <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-surface-container">
+        <div class="flex justify-between items-center w-full px-6 py-4 max-w-2xl mx-auto">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-primary/20">
+                    <span class="material-symbols-outlined text-primary-dim">person</span>
+                </div>
+                <h1 class="font-headline font-bold text-lg text-on-surface">Jurnal Kegiatan</h1>
+            </div>
+            <button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container" id="settings-btn">settings</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="app-content" class="pt-24 px-6 max-w-2xl mx-auto min-h-screen">
+        <!-- Views will be injected here by app.js -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-white/80 backdrop-blur-xl border-t border-surface-container rounded-t-[2.5rem] shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+        <button class="nav-item flex flex-col items-center justify-center transition-all duration-300" data-view="dashboard">
+            <span class="material-symbols-outlined mb-1">home</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Beranda</span>
+        </button>
+        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="riwayat">
+            <span class="material-symbols-outlined mb-1">history</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Riwayat</span>
+        </button>
+        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="laporan">
+            <span class="material-symbols-outlined mb-1">analytics</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Laporan</span>
+        </button>
+    </nav>
+
+    <!-- Toast Component -->
+    <div id="toast" class="fixed bottom-32 left-1/2 -translate-x-1/2 z-[100] bg-on-surface text-white px-6 py-3 rounded-full text-sm font-medium shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">
+        Berhasil disalin
+    </div>
+
+    <!-- Scripts -->
+    <!-- Firebase SDK (Modular via CDN) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+        "firebase/storage": "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js",
+        "firebase/analytics": "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"
+      }
+    }
+    </script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>
