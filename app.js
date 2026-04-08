@@ -21,6 +21,9 @@ const storage = getStorage(app);
 const logsCollection = collection(db, "logs");
 
 // --- Constants & State ---
+const CLOUDINARY_CLOUD_NAME = "dlqvrnjgn";
+const CLOUDINARY_UPLOAD_PRESET = "ml_default";
+
 let currentView = 'dashboard';
 let logs = [];
 
@@ -214,6 +217,28 @@ const templates = {
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Apa yang dikerjakan?</label>
                         <textarea class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all resize-none" placeholder="Tuliskan detail pekerjaan Anda..." rows="4" id="input-description" required></textarea>
+                    </div>
+
+                    <!-- Photo Upload Section -->
+                    <div class="space-y-1.5 pt-2">
+                        <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Lampiran Foto (Opsional)</label>
+                        <div class="relative bg-white border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:border-primary transition-all cursor-pointer group" onclick="document.getElementById('input-photo').click()">
+                            <input type="file" id="input-photo" accept="image/*" class="hidden" onchange="window.handlePhotoPreview(event)"/>
+                            
+                            <div id="photo-preview-container" class="hidden w-full aspect-video rounded-xl overflow-hidden border border-slate-100 mb-2 relative">
+                                <img id="photo-preview" class="w-full h-full object-cover" src=""/>
+                                <button type="button" onclick="event.stopPropagation(); window.clearPhoto(event)" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-all shadow-lg">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            </div>
+
+                            <div id="upload-placeholder" class="flex flex-col items-center justify-center py-6 text-slate-400 group-hover:text-primary transition-colors">
+                                <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-primary/10">
+                                    <span class="material-symbols-outlined text-3xl">add_a_photo</span>
+                                </div>
+                                <span class="text-[10px] font-black uppercase tracking-widest">Pilih atau Ambil Foto</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -445,16 +470,29 @@ async function handleAddLog(e) {
         const location = document.getElementById('input-location').value;
         const description = document.getElementById('input-description').value;
         const category = document.getElementById('input-category').value;
-        // Photo upload commented out
+        
         let photoUrl = "";
-        /*
+        
+        // Upload to Cloudinary if photo exists
         const photoFile = document.getElementById('input-photo').files[0];
         if (photoFile) {
-            const storageRef = ref(storage, `photos/${Date.now()}_${photoFile.name}`);
-            const snapshot = await uploadBytes(storageRef, photoFile);
-            photoUrl = await getDownloadURL(snapshot.ref);
+            submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Mengunggah Foto...</span>';
+            
+            const formData = new FormData();
+            formData.append('file', photoFile);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) throw new Error('Gagal mengunggah foto ke Cloudinary');
+            const data = await response.json();
+            photoUrl = data.secure_url;
         }
-        */
+
+        submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Menyimpan Jurnal...</span>';
 
         const newLog = {
             date,

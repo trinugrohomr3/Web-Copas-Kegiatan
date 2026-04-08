@@ -110,11 +110,25 @@ body {
     background: #FFFFFF;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
 }
 
 .premium-card:active {
-    transform: scale(0.98);
+    transform: scale(0.985);
+}
+
+/* Photo Upload Elements */
+#photo-preview-container {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+input[type="file"]::file-selector-button {
+    display: none;
 }
 
 /* Custom Scrollbar */
