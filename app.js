@@ -25,6 +25,8 @@ const CLOUDINARY_CLOUD_NAME = "dlqvrnjgn";
 const CLOUDINARY_UPLOAD_PRESET = "ml_default";
 
 let currentView = 'dashboard';
+let currentFilter = 'all';
+let customDateRange = { start: '', end: '' };
 let logs = [];
 
 // --- Utilities ---
@@ -314,79 +316,79 @@ const templates = {
         `;
     },
     laporan: () => {
-        const sortedLogs = [...logs].sort((a,b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+        const filteredLogs = getFilteredLogs();
         
         return `
-            <section class="view-active space-y-8">
-                <!-- Hero Report -->
-                <div class="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary-dim p-8 text-white shadow-lg">
-                    <div class="relative z-10">
-                        <span class="text-xs font-medium opacity-90 mb-2 block uppercase tracking-widest font-label">Ringkasan</span>
-                        <h2 class="text-4xl font-headline font-extrabold tracking-tight mb-4">Laporan Bulanan</h2>
-                        <p class="max-w-md text-sm opacity-90 font-body leading-relaxed">Ekspor atau salin detail kegiatan bulanan Anda untuk pelaporan rutin.</p>
+            <section class="space-y-8 pb-20">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-on-surface tracking-tight">Laporan Kerja</h2>
+                        <p class="text-xs font-bold text-outline uppercase tracking-widest mt-1">Export & Analisa Data</p>
                     </div>
-                    <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+                    <button onclick="exportToExcel()" class="bg-primary text-white px-6 py-3 rounded-2xl flex items-center justify-center gap-3 font-bold shadow-lg shadow-primary/20 hover:bg-primary-dim active:scale-95 transition-all text-sm">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        <span>Export ke Excel</span>
+                    </button>
                 </div>
 
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between px-1">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">list_alt</span>
-                            <h3 class="text-lg font-headline font-bold text-on-surface">Detail Aktivitas</h3>
+                <!-- Filter Bar -->
+                <div class="premium-card p-4 rounded-3xl overflow-x-auto">
+                    <div class="flex items-center gap-2 min-w-max">
+                        <button onclick="applyFilter('all')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${currentFilter === 'all' ? 'active' : 'bg-slate-50 text-outline'}">Semua</button>
+                        <button onclick="applyFilter('today')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${currentFilter === 'today' ? 'active' : 'bg-slate-50 text-outline'}">Hari Ini</button>
+                        <button onclick="applyFilter('week')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${currentFilter === 'week' ? 'active' : 'bg-slate-50 text-outline'}">Minggu Ini</button>
+                        <button onclick="applyFilter('month')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${currentFilter === 'month' ? 'active' : 'bg-slate-50 text-outline'}">Bulan Ini</button>
+                        <button onclick="openCustomRange()" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${currentFilter === 'range' ? 'active' : 'bg-slate-50 text-outline'}">Custom Range</button>
+                    </div>
+
+                    ${currentFilter === 'range' ? `
+                        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-slate-50">
+                            <input type="date" id="range-start" value="${customDateRange.start}" onchange="updateCustomRange()" class="bg-slate-50 border-none rounded-lg px-3 py-1.5 text-xs font-bold text-outline">
+                            <span class="text-outline text-xs font-bold">s/d</span>
+                            <input type="date" id="range-end" value="${customDateRange.end}" onchange="updateCustomRange()" class="bg-slate-50 border-none rounded-lg px-3 py-1.5 text-xs font-bold text-outline">
                         </div>
-                        <button onclick="copyAllLogs()" class="flex items-center gap-1 text-primary-dim font-bold text-xs uppercase tracking-wider hover:opacity-80 transition-opacity">
-                            <span class="material-symbols-outlined text-sm">content_copy</span>
-                            Salin Semua
-                        </button>
-                    </div>
-
-                    <div class="space-y-4">
-                        ${sortedLogs.length ? sortedLogs.map((log, idx) => `
-                            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span class="text-[10px] font-bold text-primary-dim uppercase tracking-wider font-label">${log.category}</span>
-                                            ${log.photoUrl ? '<span class="material-symbols-outlined text-[12px] text-primary">image</span>' : ''}
-                                        </div>
-                                        <div class="flex items-center justify-between gap-4">
-                                            <h4 class="text-base font-bold text-on-surface font-headline leading-tight">${log.description}</h4>
-                                            <button onclick="copyEntry('${log.description}')" class="shrink-0 p-2 text-outline hover:text-primary transition-colors active:scale-90" title="Salin Deskripsi">
-                                                <span class="material-symbols-outlined text-lg">content_copy</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-50">
-                                    <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
-                                        <div class="overflow-hidden">
-                                            <p class="text-[8px] text-outline font-bold uppercase tracking-widest">Tanggal</p>
-                                            <p class="text-[11px] font-bold text-on-surface truncate">${log.date}</p>
-                                        </div>
-                                        <button onclick="copyEntry('${log.date}')" class="text-outline hover:text-primary active:scale-90 ml-2">
-                                            <span class="material-symbols-outlined text-[14px]">content_copy</span>
-                                        </button>
-                                    </div>
-                                    <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
-                                        <div class="overflow-hidden">
-                                            <p class="text-[8px] text-outline font-bold uppercase tracking-widest">Waktu</p>
-                                            <p class="text-[11px] font-bold text-on-surface truncate">${log.time}</p>
-                                        </div>
-                                        <button onclick="copyEntry('${log.time}')" class="text-outline hover:text-primary active:scale-90 ml-2">
-                                            <span class="material-symbols-outlined text-[14px]">content_copy</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('') : '<p class="text-center text-outline py-12">Tidak ada data untuk laporan.</p>'}
-                    </div>
-
-                    ${sortedLogs.length ? `
-                        <button onclick="copyAllLogs()" class="w-full bg-primary text-white px-6 py-4 rounded-full flex justify-center items-center gap-3 font-label font-bold hover:bg-primary-dim active:scale-95 transition-all shadow-lg shadow-primary/20 mt-8">
-                            <span class="material-symbols-outlined">content_copy</span>
-                            <span>Salin Seluruh Laporan</span>
-                        </button>
                     ` : ''}
+                </div>
+
+                <!-- Report Table -->
+                <div class="report-container premium-card p-2">
+                    <div class="overflow-x-auto">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-12">No</th>
+                                    <th class="w-32">Waktu</th>
+                                    <th class="w-32">Kategori</th>
+                                    <th>Detail Kegiatan</th>
+                                    <th class="w-32">Lokasi</th>
+                                    <th class="w-20">Foto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredLogs.length ? filteredLogs.map((log, idx) => `
+                                    <tr>
+                                        <td class="text-center font-mono opacity-40">${idx + 1}</td>
+                                        <td>
+                                            <div class="font-bold">${log.date}</div>
+                                            <div class="text-[10px] text-outline font-medium">${log.time}</div>
+                                        </td>
+                                        <td>
+                                            <span class="px-2 py-1 rounded-md bg-slate-50 text-[10px] border border-slate-100">${log.category}</span>
+                                        </td>
+                                        <td class="leading-relaxed whitespace-pre-wrap">${log.description}</td>
+                                        <td class="text-outline text-[10px]">${log.location || '-'}</td>
+                                        <td>
+                                            ${log.photoUrl ? `
+                                                <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
+                                                    <img src="${log.photoUrl}" class="w-full h-full object-cover" />
+                                                </div>
+                                            ` : '<span class="text-outline text-[10px] opacity-30">N/A</span>'}
+                                        </td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="6" class="text-center py-20 text-outline italic">Tidak ada data yang sesuai filter...</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         `;
@@ -580,6 +582,149 @@ document.querySelectorAll('.nav-item').forEach(item => {
         navigate(view);
     });
 });
+
+// --- Helper & Filter Functions ---
+
+function getFilteredLogs() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    return logs.filter(log => {
+        const logDate = new Date(log.date);
+        logDate.setHours(0,0,0,0);
+        
+        if (currentFilter === 'today') {
+            return logDate.getTime() === today.getTime();
+        }
+        if (currentFilter === 'week') {
+            const firstDayOfWeek = new Date(today);
+            firstDayOfWeek.setDate(today.getDate() - today.getDay());
+            return logDate >= firstDayOfWeek && logDate <= today;
+        }
+        if (currentFilter === 'month') {
+            return logDate.getMonth() === today.getMonth() && logDate.getFullYear() === today.getFullYear();
+        }
+        if (currentFilter === 'range') {
+            const start = customDateRange.start ? new Date(customDateRange.start) : null;
+            const end = customDateRange.end ? new Date(customDateRange.end) : null;
+            if (start) start.setHours(0,0,0,0);
+            if (end) end.setHours(23,59,59,999);
+            
+            if (start && end) return logDate >= start && logDate <= end;
+            if (start) return logDate >= start;
+            if (end) return logDate <= end;
+        }
+        return true; // "all"
+    }).sort((a,b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+}
+
+function applyFilter(type) {
+    currentFilter = type;
+    render();
+}
+
+function openCustomRange() {
+    currentFilter = 'range';
+    render();
+}
+
+function updateCustomRange() {
+    customDateRange.start = document.getElementById('range-start').value;
+    customDateRange.end = document.getElementById('range-end').value;
+    render();
+}
+
+async function fetchImageAsBase64(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+async function exportToExcel() {
+    const filteredLogs = getFilteredLogs();
+    if (!filteredLogs.length) {
+        showToast("Tidak ada data untuk diexport!");
+        return;
+    }
+
+    showToast("Menyiapkan Excel... (Mohon tunggu)");
+    
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Laporan Kegiatan');
+
+        // Setup Columns
+        worksheet.columns = [
+            { header: 'No', key: 'no', width: 5 },
+            { header: 'Tanggal', key: 'date', width: 15 },
+            { header: 'Waktu', key: 'time', width: 10 },
+            { header: 'Kategori', key: 'category', width: 15 },
+            { header: 'Kegiatan', key: 'description', width: 50 },
+            { header: 'Lokasi', key: 'location', width: 20 },
+            { header: 'Foto', key: 'photo', width: 20 }
+        ];
+
+        // Header Styling
+        worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF87CEEB' } };
+        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // Add Data
+        for (let i = 0; i < filteredLogs.length; i++) {
+            const log = filteredLogs[i];
+            const rowIndex = i + 2;
+            const row = worksheet.addRow({
+                no: i + 1,
+                date: log.date,
+                time: log.time,
+                category: log.category,
+                description: log.description,
+                location: log.location || '-'
+            });
+
+            row.height = 60; // Fixed height for thumbnail
+            row.alignment = { vertical: 'middle', wrapText: true };
+
+            // Embed Image if exists
+            if (log.photoUrl) {
+                try {
+                    const base64 = await fetchImageAsBase64(log.photoUrl);
+                    const imageId = workbook.addImage({
+                        base64: base64,
+                        extension: 'jpeg',
+                    });
+                    worksheet.addImage(imageId, {
+                        tl: { col: 6, row: rowIndex - 1 },
+                        ext: { width: 60, height: 60 },
+                        editAs: 'oneCell'
+                    });
+                } catch (e) {
+                    console.error("Gagal memuat gambar untuk Excel:", e);
+                }
+            }
+        }
+
+        // Save File
+        const buffer = await workbook.xlsx.writeBuffer();
+        saveAs(new Blob([buffer]), `Laporan_Kegiatan_${new Date().toISOString().split('T')[0]}.xlsx`);
+        showToast("Excel berhasil diunduh!");
+        
+    } catch (error) {
+        console.error("Export Error:", error);
+        showToast("Gagal export excel. Silakan coba lagi.");
+    }
+}
+
+// Expose functions to window
+window.applyFilter = applyFilter;
+window.openCustomRange = openCustomRange;
+window.updateCustomRange = updateCustomRange;
+window.exportToExcel = exportToExcel;
 
 // Initialize first view & fetch data
 navigate('dashboard');

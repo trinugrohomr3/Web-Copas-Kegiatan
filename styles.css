@@ -131,16 +131,58 @@ input[type="file"]::file-selector-button {
     display: none;
 }
 
+/* Laporan Table Styles */
+.report-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 1.5rem;
+    background: white;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.8rem;
+}
+
+.report-table th {
+    background: #F8FAFC;
+    color: var(--outline);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    border-bottom: 2px solid #F1F5F9;
+}
+
+.report-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #F1F5F9;
+    color: var(--text-main);
+    font-weight: 600;
+}
+
+.report-table tr:hover {
+    background: #F1F5F9/30;
+}
+
+/* Filter Bar Styles */
+.filter-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+}
+
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: #E2E8F0;
-    border-radius: 10px;
+@media (max-width: 640px) {
+    .report-table {
+        font-size: 0.7rem;
+    }
 }
 
 /* Toast Styles */
