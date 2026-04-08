@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc, doc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
@@ -303,9 +303,14 @@ const templates = {
                                                 </div>
                                             ` : ''}
                                         </div>
-                                        <button onclick="copyEntry('${log.description}')" class="text-outline hover:text-primary transition-colors">
-                                            <span class="material-symbols-outlined text-lg">content_copy</span>
-                                        </button>
+                                        <div class="flex flex-col gap-2">
+                                            <button onclick="copyEntry('${log.description}')" class="text-outline hover:text-primary transition-colors p-1" title="Salin">
+                                                <span class="material-symbols-outlined text-lg">content_copy</span>
+                                            </button>
+                                            <button onclick="handleDeleteLog('${log.id}')" class="text-outline hover:text-red-500 transition-colors p-1" title="Hapus">
+                                                <span class="material-symbols-outlined text-lg">delete</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 `).join('')}
                             </div>
@@ -363,6 +368,7 @@ const templates = {
                                     <th>Detail Kegiatan</th>
                                     <th class="w-32">Lokasi</th>
                                     <th class="w-20">Foto</th>
+                                    <th class="w-16">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -372,7 +378,7 @@ const templates = {
                                         currentDate = log.date;
                                         divider = `
                                             <tr class="date-sep">
-                                                <td colspan="6" class="bg-slate-50/50 py-3 px-6 text-[10px] font-black text-primary-dim uppercase tracking-[0.2em] border-y border-slate-100/50">
+                                                <td colspan="7" class="bg-slate-50/50 py-3 px-6 text-[10px] font-black text-primary-dim uppercase tracking-[0.2em] border-y border-slate-100/50">
                                                     <div class="flex items-center gap-2">
                                                         <span class="material-symbols-outlined text-sm">calendar_today</span>
                                                         ${formatDate(log.date)}
@@ -399,9 +405,14 @@ const templates = {
                                                     </div>
                                                 ` : '<span class="text-outline text-[10px] opacity-30 italic">No Photo</span>'}
                                             </td>
+                                            <td class="text-center">
+                                                <button onclick="handleDeleteLog('${log.id}')" class="text-outline hover:text-red-500 transition-colors active:scale-90" title="Hapus">
+                                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                                </button>
+                                            </td>
                                         </tr>
                                     `;
-                                }).join('') : '<tr><td colspan="6" class="text-center py-20 text-outline italic">Tidak ada data yang sesuai filter...</td></tr>'}
+                                }).join('') : '<tr><td colspan="7" class="text-center py-20 text-outline italic">Tidak ada data yang sesuai filter...</td></tr>'}
                             </tbody>
                         </table>
                     </div>
@@ -736,11 +747,30 @@ async function exportToExcel() {
     }
 }
 
+async function handleDeleteLog(id) {
+    if (!confirm("Apakah Anda yakin ingin menghapus catatan ini secara permanen?")) return;
+
+    try {
+        showToast("Menghapus...");
+        const docRef = doc(db, "logs", id);
+        await deleteDoc(docRef);
+        
+        // Update local state
+        logs = logs.filter(log => log.id !== id);
+        render();
+        showToast("Catatan berhasil dihapus.");
+    } catch (error) {
+        console.error("Error deleting document: ", error);
+        showToast("Gagal menghapus catatan. Cek koneksi Anda.");
+    }
+}
+
 // Expose functions to window
 window.applyFilter = applyFilter;
 window.openCustomRange = openCustomRange;
 window.updateCustomRange = updateCustomRange;
 window.exportToExcel = exportToExcel;
+window.handleDeleteLog = handleDeleteLog;
 
 // Initialize first view & fetch data
 navigate('dashboard');
