@@ -233,12 +233,11 @@ const templates = {
                     <!-- Photo Upload Section -->
                     <div class="space-y-1.5 pt-2">
                         <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Lampiran Foto (Opsional)</label>
-                        <label for="input-photo" class="block relative bg-white border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:border-primary transition-all cursor-pointer group">
-                            <input type="file" id="input-photo" accept="image/*" class="hidden" onchange="window.handlePhotoPreview(event)"/>
+                        <div class="block relative bg-white border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:border-primary transition-all cursor-pointer group min-h-[120px] flex items-center justify-center overflow-hidden">
                             
                             <div id="photo-preview-container" class="hidden w-full aspect-video rounded-xl overflow-hidden border border-slate-100 mb-2 relative">
                                 <img id="photo-preview" class="w-full h-full object-cover" src=""/>
-                                <button type="button" onclick="event.stopPropagation(); window.clearPhoto(event)" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-all shadow-lg">
+                                <button type="button" onclick="event.stopPropagation(); window.clearPhoto(event)" class="absolute top-2 right-2 w-10 h-10 rounded-full bg-black/80 text-white flex items-center justify-center hover:bg-black transition-all shadow-xl z-[40]">
                                     <span class="material-symbols-outlined text-sm">close</span>
                                 </button>
                             </div>
@@ -249,7 +248,8 @@ const templates = {
                                 </div>
                                 <span class="text-[10px] font-black uppercase tracking-widest">Pilih atau Ambil Foto</span>
                             </div>
-                        </label>
+                            <input type="file" id="input-photo" accept="image/jpeg,image/png,image/gif" class="absolute inset-0 w-full h-full opacity-0 z-30 cursor-pointer" style="display: block !important;" onchange="window.handlePhotoPreview(event)"/>
+                        </div>
                     </div>
                 </div>
 
