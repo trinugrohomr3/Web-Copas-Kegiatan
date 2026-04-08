@@ -317,6 +317,7 @@ const templates = {
     },
     laporan: () => {
         const filteredLogs = getFilteredLogs();
+        let currentDate = null;
         
         return `
             <section class="space-y-8 pb-20">
@@ -365,27 +366,42 @@ const templates = {
                                 </tr>
                             </thead>
                             <tbody>
-                                ${filteredLogs.length ? filteredLogs.map((log, idx) => `
-                                    <tr>
-                                        <td class="text-center font-mono opacity-40">${idx + 1}</td>
-                                        <td>
-                                            <div class="font-bold">${log.date}</div>
-                                            <div class="text-[10px] text-outline font-medium">${log.time}</div>
-                                        </td>
-                                        <td>
-                                            <span class="px-2 py-1 rounded-md bg-slate-50 text-[10px] border border-slate-100">${log.category}</span>
-                                        </td>
-                                        <td class="leading-relaxed whitespace-pre-wrap">${log.description}</td>
-                                        <td class="text-outline text-[10px]">${log.location || '-'}</td>
-                                        <td>
-                                            ${log.photoUrl ? `
-                                                <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm">
-                                                    <img src="${log.photoUrl}" class="w-full h-full object-cover" />
-                                                </div>
-                                            ` : '<span class="text-outline text-[10px] opacity-30">N/A</span>'}
-                                        </td>
-                                    </tr>
-                                `).join('') : '<tr><td colspan="6" class="text-center py-20 text-outline italic">Tidak ada data yang sesuai filter...</td></tr>'}
+                                ${filteredLogs.length ? filteredLogs.map((log, idx) => {
+                                    let divider = '';
+                                    if (log.date !== currentDate) {
+                                        currentDate = log.date;
+                                        divider = `
+                                            <tr class="date-sep">
+                                                <td colspan="6" class="bg-slate-50/50 py-3 px-6 text-[10px] font-black text-primary-dim uppercase tracking-[0.2em] border-y border-slate-100/50">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="material-symbols-outlined text-sm">calendar_today</span>
+                                                        ${formatDate(log.date)}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }
+                                    return divider + `
+                                        <tr>
+                                            <td class="text-center font-mono opacity-40 text-[10px]">${idx + 1}</td>
+                                            <td>
+                                                <div class="font-bold text-xs">${log.time}</div>
+                                            </td>
+                                            <td>
+                                                <span class="px-2 py-1 rounded-md bg-slate-50 text-[10px] border border-slate-100 font-bold">${log.category}</span>
+                                            </td>
+                                            <td class="leading-relaxed whitespace-pre-wrap py-4">${log.description}</td>
+                                            <td class="text-outline text-[10px] font-medium">${log.location || '-'}</td>
+                                            <td>
+                                                ${log.photoUrl ? `
+                                                    <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-150 hover:z-50 relative cursor-pointer">
+                                                        <img src="${log.photoUrl}" class="w-full h-full object-cover" />
+                                                    </div>
+                                                ` : '<span class="text-outline text-[10px] opacity-30 italic">No Photo</span>'}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('') : '<tr><td colspan="6" class="text-center py-20 text-outline italic">Tidak ada data yang sesuai filter...</td></tr>'}
                             </tbody>
                         </table>
                     </div>
