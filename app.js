@@ -30,6 +30,7 @@ let customDateRange = { start: '', end: '' };
 let logs = [];
 let isEditMode = false;
 let editingLogId = null;
+let currentModalImageUrl = '';
 
 // --- Utilities ---
 async function fetchLogs() {
@@ -92,7 +93,7 @@ const templates = {
                             <span class="w-1.5 h-1.5 rounded-full bg-primary-dim animate-pulse"></span>
                             <span class="text-[10px] font-bold text-primary-dim uppercase tracking-widest">Sistem Aktif</span>
                         </div>
-                        <h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Halo, Selamat Bekerja!</h2>
+                        <h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-2">Halo Putri, Selamat Bekerja!</h2>
                         <p class="text-sm text-outline font-medium max-w-[240px] leading-relaxed">Hari ini ada <span class="text-primary-dim font-bold">${todayLogs.length} kegiatan</span> yang sudah Anda catat.</p>
                     </div>
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
@@ -217,7 +218,11 @@ const templates = {
 
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Lokasi</label>
-                        <input class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Misal: Kantor Lt 4, Client Side" type="text" id="input-location"/>
+                        <input class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold text-on-surface placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Misal: Kantor Lt 4, Client Side" type="text" id="input-location" list="location-list"/>
+                        <datalist id="location-list">
+                            <option value="Sudin PPAPP">
+                            <option value="Kantor Kecamatan Tj. Priok">
+                        </datalist>
                     </div>
 
                     <div class="space-y-1.5">
@@ -339,7 +344,7 @@ const templates = {
                                             <td class="text-outline text-[10px] font-medium">${log.location || '-'}</td>
                                             <td>
                                                 ${log.photoUrl ? `
-                                                    <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-150 hover:z-50 relative cursor-pointer">
+                                                    <div onclick="openImageModal('${log.photoUrl}')" class="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 shadow-sm transition-transform hover:scale-150 hover:z-50 relative cursor-pointer">
                                                         <img src="${log.photoUrl}" class="w-full h-full object-cover" />
                                                     </div>
                                                 ` : '<span class="text-outline text-[10px] opacity-30 italic">No Photo</span>'}
@@ -760,6 +765,75 @@ window.updateCustomRange = updateCustomRange;
 window.exportToExcel = exportToExcel;
 window.handleDeleteLog = handleDeleteLog;
 window.handleEditLog = handleEditLog;
+
+// --- Image Modal Logic ---
+
+function openImageModal(url) {
+    currentModalImageUrl = url;
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-image');
+    modalImg.src = url;
+    modal.classList.add('show');
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('image-modal');
+    modal.classList.remove('show');
+    currentModalImageUrl = '';
+}
+
+async function downloadImage() {
+    if (!currentModalImageUrl) return;
+    try {
+        showToast("Mengunduh...");
+        const response = await fetch(currentModalImageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `jurnal_kegiatan_${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        showToast("Unduhan dimulai.");
+    } catch (e) {
+        window.open(currentModalImageUrl, '_blank');
+        showToast("Membuka gambar di tab baru.");
+    }
+}
+
+async function copyImageToClipboard() {
+    if (!currentModalImageUrl) return;
+    try {
+        showToast("Menyalin foto...");
+        const response = await fetch(currentModalImageUrl);
+        const blob = await response.blob();
+        
+        // Browser compatibility check
+        if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    [blob.type]: blob
+                })
+            ]);
+            showToast("Foto berhasil disalin!");
+        } else {
+            throw new Error('Clipboard API not available');
+        }
+    } catch (e) {
+        // Fallback: Copy URL
+        navigator.clipboard.writeText(currentModalImageUrl).then(() => {
+            showToast("Link foto disalin (Clipboard API tidak support foto).");
+        });
+    }
+}
+
+// Expose to window
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.downloadImage = downloadImage;
+window.copyImageToClipboard = copyImageToClipboard;
 
 // Initialize first view & fetch data
 navigate('dashboard');

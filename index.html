@@ -54,12 +54,12 @@
     <header class="fixed top-0 w-full z-50 glass border-b border-surface-container">
         <div class="flex justify-between items-center w-full px-6 py-4 max-w-5xl mx-auto">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center overflow-hidden shadow-sm">
-                    <span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+                <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden shadow-sm">
+                    <img src="https://res.cloudinary.com/dlqvrnjgn/image/upload/v1712561000/logo_ppapp.png" alt="Logo PPAPP" class="w-full h-full object-contain p-1">
                 </div>
                 <div>
-                    <h1 class="font-headline font-extrabold text-lg text-on-surface leading-tight tracking-tight">Jurnal Kegiatan</h1>
-                    <p class="text-[10px] text-outline font-bold uppercase tracking-widest">Digital Logbook</p>
+                    <h1 class="font-headline font-extrabold text-lg text-on-surface leading-tight tracking-tight">Jurnal PPAPP</h1>
+                    <p class="text-[10px] text-outline font-bold uppercase tracking-widest">Jakarta Utara</p>
                 </div>
             </div>
             <button class="material-symbols-outlined text-outline hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container active:scale-95" id="settings-btn" title="Pengaturan">settings</button>
@@ -84,6 +84,29 @@
             <span class="text-[9px] font-extrabold uppercase tracking-widest">Laporan</span>
         </button>
     </nav>
+
+    <!-- Image Preview Modal -->
+    <div id="image-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="absolute inset-0 bg-on-surface/80 backdrop-blur-md" onclick="closeImageModal()"></div>
+        <div class="relative bg-white rounded-[2rem] overflow-hidden shadow-2xl max-w-4xl w-full translate-y-8 transition-transform duration-300" id="modal-content">
+            <div class="aspect-auto max-h-[70vh] overflow-hidden bg-slate-100 flex items-center justify-center">
+                <img id="modal-image" src="" class="max-w-full max-h-full object-contain" />
+            </div>
+            <div class="p-6 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <button onclick="downloadImage()" class="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-primary-dim transition-all active:scale-95 shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-lg">download</span>
+                        <span>Download</span>
+                    </button>
+                    <button onclick="copyImageToClipboard()" class="flex items-center gap-2 bg-slate-50 text-on-surface-variant px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-lg">content_copy</span>
+                        <span>Copy Image</span>
+                    </button>
+                </div>
+                <button onclick="closeImageModal()" class="text-outline hover:text-on-surface font-bold text-xs uppercase tracking-widest px-4 py-2">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Component -->
     <div id="toast" class="fixed bottom-32 left-1/2 -translate-x-1/2 z-[100] bg-on-surface text-white px-6 py-3 rounded-full text-sm font-medium shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300">

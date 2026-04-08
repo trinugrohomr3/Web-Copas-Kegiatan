@@ -242,6 +242,16 @@ input[type="file"]::file-selector-button {
     }
 }
 
+/* Image Modal Helper */
+#image-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#image-modal.show #modal-content {
+    transform: translateY(0);
+}
+
 /* Toast Styles */
 #toast.show {
     opacity: 1;
