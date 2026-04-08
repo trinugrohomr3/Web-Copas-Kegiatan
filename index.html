@@ -52,7 +52,7 @@
 <body class="bg-surface text-on-surface min-h-screen pb-32 font-body overflow-x-hidden">
     <!-- Top Bar -->
     <header class="fixed top-0 w-full z-50 glass border-b border-surface-container">
-        <div class="flex justify-between items-center w-full px-6 py-4 max-w-2xl mx-auto">
+        <div class="flex justify-between items-center w-full px-6 py-4 max-w-5xl mx-auto">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-primary flex items-center justify-center overflow-hidden shadow-sm">
                     <span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">edit_note</span>
@@ -67,7 +67,7 @@
     </header>
 
     <!-- Main Content Shell -->
-    <main class="pt-24 px-6 max-w-2xl mx-auto min-h-screen relative">
+    <main class="pt-24 px-6 max-w-5xl mx-auto min-h-screen relative">
         <div id="app-content">
             <!-- Views will be injected here by app.js -->
         </div>
@@ -78,10 +78,6 @@
         <button class="nav-item flex flex-col items-center justify-center transition-all duration-300 active" data-view="dashboard" id="nav-dashboard">
             <span class="material-symbols-outlined mb-1">team_dashboard</span>
             <span class="text-[9px] font-extrabold uppercase tracking-widest">Beranda</span>
-        </button>
-        <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="riwayat" id="nav-riwayat">
-            <span class="material-symbols-outlined mb-1">history_edu</span>
-            <span class="text-[9px] font-extrabold uppercase tracking-widest">Riwayat</span>
         </button>
         <button class="nav-item flex flex-col items-center justify-center text-outline transition-all duration-300" data-view="laporan" id="nav-laporan">
             <span class="material-symbols-outlined mb-1">analytics</span>

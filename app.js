@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc, doc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
@@ -28,6 +28,8 @@ let currentView = 'dashboard';
 let currentFilter = 'all';
 let customDateRange = { start: '', end: '' };
 let logs = [];
+let isEditMode = false;
+let editingLogId = null;
 
 // --- Utilities ---
 async function fetchLogs() {
@@ -96,69 +98,71 @@ const templates = {
                     <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
                 </div>
 
-                <!-- Main Action Card -->
-                <div class="premium-card p-2 rounded-[1.8rem] bg-slate-50">
-                    <button onclick="navigate('input')" class="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-white border border-slate-100 hover:border-primary transition-all duration-300 shadow-sm group">
-                        <div class="flex items-center gap-5">
-                            <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary-dim group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                                <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
-                            </div>
-                            <div class="text-left">
-                                <span class="block font-headline font-extrabold text-xl text-on-surface tracking-tight">Catat Baru</span>
-                                <span class="block font-body text-xs text-outline font-medium mt-0.5">Input progres kegiatan Anda</span>
-                            </div>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-white transition-all">
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </div>
-                    </button>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="premium-card p-6 rounded-3xl">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-400">
-                                <span class="material-symbols-outlined text-xl">schedule</span>
-                            </div>
-                        </div>
-                        <p class="font-headline font-black text-3xl text-on-surface tracking-tight">${calculateFocusTime()}</p>
-                        <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Estimasi Kerja</p>
-                    </div>
-                    <div class="premium-card p-6 rounded-3xl">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-400">
-                                <span class="material-symbols-outlined text-xl">verified</span>
-                            </div>
-                        </div>
-                        <p class="font-headline font-black text-3xl text-on-surface tracking-tight">${calculateTargetProgress()}%</p>
-                        <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-1">Pencapaian Hari Ini</p>
-                    </div>
-                </div>
-
-                <!-- Recent Activities -->
-                <section>
-                    <div class="flex items-center justify-between mb-6 px-1">
-                        <h3 class="font-headline font-extrabold text-lg text-on-surface tracking-tight">Log Terakhir</h3>
-                        <button onclick="navigate('riwayat')" class="text-xs font-bold text-primary-dim uppercase tracking-widest border-b-2 border-primary/20 pb-0.5">Semua</button>
-                    </div>
-                    <div class="space-y-4">
-                        ${recentLogs.length ? recentLogs.map(log => `
-                            <div class="premium-card flex items-center gap-4 p-4 rounded-2xl hover:border-primary/30 transition-all cursor-pointer">
-                                <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-on-surface-variant/50 shrink-0">
-                                    <span class="material-symbols-outlined text-2xl">${getIconForCategory(log.category)}</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-center mb-0.5">
-                                        <h4 class="font-headline font-bold text-on-surface text-sm truncate pr-2">${log.description}</h4>
-                                        <span class="text-[10px] font-bold text-outline whitespace-nowrap">${log.time}</span>
+                <!-- Dashboard Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- Column 1: Small Stats & Action -->
+                    <div class="lg:col-span-4 space-y-6">
+                        <!-- Main Action Card -->
+                        <div class="premium-card p-2 rounded-[1.8rem] bg-slate-50">
+                            <button onclick="navigate('input')" class="w-full flex items-center justify-between p-6 rounded-[1.5rem] bg-white border border-slate-100 hover:border-primary transition-all duration-300 shadow-sm group">
+                                <div class="flex items-center gap-5">
+                                    <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary-dim group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                                        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
                                     </div>
-                                    <p class="font-body text-[11px] text-outline truncate">${log.location || 'Sudah di kantor'}</p>
+                                    <div class="text-left">
+                                        <span class="block font-headline font-extrabold text-xl text-on-surface tracking-tight">Catat Baru</span>
+                                        <span class="block font-body text-xs text-outline font-medium mt-0.5">Input progres kegiatan Anda</span>
+                                    </div>
                                 </div>
+                                <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-outline group-hover:bg-primary group-hover:text-white transition-all">
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="premium-card p-5 rounded-3xl">
+                                <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-400 mb-3">
+                                    <span class="material-symbols-outlined text-lg">schedule</span>
+                                </div>
+                                <p class="font-headline font-black text-2xl text-on-surface tracking-tight">${calculateFocusTime()}</p>
+                                <p class="text-[9px] font-bold text-outline uppercase tracking-widest mt-1">Estimasi Kerja</p>
                             </div>
-                        `).join('') : '<p class="text-center text-outline py-8 text-sm italic">Belum ada data...</p>'}
+                            <div class="premium-card p-5 rounded-3xl">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-400 mb-3">
+                                    <span class="material-symbols-outlined text-lg">verified</span>
+                                </div>
+                                <p class="font-headline font-black text-2xl text-on-surface tracking-tight">${calculateTargetProgress()}%</p>
+                                <p class="text-[9px] font-bold text-outline uppercase tracking-widest mt-1">Pencapaian</p>
+                            </div>
+                        </div>
                     </div>
-                </section>
+
+                    <!-- Column 2: Recent Activities -->
+                    <div class="lg:col-span-8">
+                        <div class="flex items-center justify-between mb-6 px-1">
+                            <h3 class="font-headline font-extrabold text-lg text-on-surface tracking-tight">Log Terakhir</h3>
+                            <button onclick="navigate('laporan')" class="text-xs font-bold text-primary-dim uppercase tracking-widest border-b-2 border-primary/20 pb-0.5">Semua</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${recentLogs.length ? recentLogs.map(log => `
+                                <div class="premium-card flex items-center gap-4 p-4 rounded-2xl hover:border-primary/30 transition-all cursor-pointer">
+                                    <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-on-surface-variant/50 shrink-0">
+                                        <span class="material-symbols-outlined text-2xl">${getIconForCategory(log.category)}</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-center mb-0.5">
+                                            <h4 class="font-headline font-bold text-on-surface text-sm truncate pr-2">${log.description}</h4>
+                                            <span class="text-[10px] font-bold text-outline whitespace-nowrap">${log.time}</span>
+                                        </div>
+                                        <p class="font-body text-[11px] text-outline truncate">${log.location || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-center text-outline py-8 text-sm italic col-span-full">Belum ada data...</p>'}
+                        </div>
+                    </div>
+                </div>
             </section>
         `;
     },
@@ -169,8 +173,8 @@ const templates = {
                     <span class="material-symbols-outlined">arrow_back</span>
                 </button>
                 <div>
-                    <h2 class="text-2xl font-black text-on-surface tracking-tight">Catat Kegiatan</h2>
-                    <p class="text-xs font-bold text-outline uppercase tracking-widest">Detail Baru</p>
+                    <h2 class="text-2xl font-black text-on-surface tracking-tight">${isEditMode ? 'Edit Kegiatan' : 'Catat Kegiatan'}</h2>
+                    <p class="text-xs font-bold text-outline uppercase tracking-widest">${isEditMode ? 'Update Data' : 'Detail Baru'}</p>
                 </div>
             </div>
 
@@ -246,7 +250,7 @@ const templates = {
 
                 <div class="pt-6 pb-12">
                     <button type="submit" class="w-full py-4 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/30 hover:bg-primary-dim active:scale-95 transition-all">
-                        Simpan Log
+                        ${isEditMode ? 'Simpan Perubahan' : 'Simpan Log'}
                     </button>
                     <button type="button" onclick="navigate('dashboard')" class="w-full py-4 mt-2 text-outline font-bold text-xs uppercase tracking-widest hover:text-on-surface transition-colors">
                         Batal
@@ -255,71 +259,6 @@ const templates = {
             </form>
         </section>
     `,
-    riwayat: () => {
-        const grouped = logs.reduce((acc, log) => {
-            const relDate = getRelativeDate(log.date);
-            if (!acc[relDate]) acc[relDate] = [];
-            acc[relDate].push(log);
-            return acc;
-        }, {});
-
-        const sortedKeys = Object.keys(grouped).sort((a, b) => {
-            if (a === 'Hari Ini') return -1;
-            if (b === 'Hari Ini') return 1;
-            if (a === 'Kemarin') return -1;
-            if (b === 'Kemarin') return 1;
-            return new Date(grouped[b][0].date) - new Date(grouped[a][0].date);
-        });
-
-        return `
-            <section class="view-active space-y-8">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-on-surface">Riwayat Kegiatan</h2>
-                    <span class="bg-primary/10 text-primary-dim px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">${logs.length} Total</span>
-                </div>
-                <div class="space-y-8">
-                    ${sortedKeys.length ? sortedKeys.map(key => `
-                        <div class="space-y-4">
-                            <h3 class="font-headline font-bold text-primary-dim text-xs uppercase tracking-widest pl-1">${key}</h3>
-                            <div class="space-y-3">
-                                ${grouped[key].sort((a,b) => b.time.localeCompare(a.time)).map(log => `
-                                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-start gap-4">
-                                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-outlined text-slate-400">${getIconForCategory(log.category)}</span>
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="text-[10px] font-bold text-primary-dim uppercase tracking-wider">${log.category}</span>
-                                                <span class="text-[10px] text-outline">${log.time}</span>
-                                            </div>
-                                            <h4 class="font-headline font-bold text-on-surface text-sm mb-1">${log.description}</h4>
-                                            <div class="flex items-center gap-1 text-outline">
-                                                <span class="material-symbols-outlined text-xs">location_on</span>
-                                                <span class="text-[10px]">${log.location || 'N/A'}</span>
-                                            </div>
-                                            ${log.photoUrl ? `
-                                                <div class="mt-3 rounded-xl overflow-hidden border border-slate-100 aspect-video w-full bg-slate-50">
-                                                    <img src="${log.photoUrl}" class="w-full h-full object-cover" loading="lazy"/>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                        <div class="flex flex-col gap-2">
-                                            <button onclick="copyEntry('${log.description}')" class="text-outline hover:text-primary transition-colors p-1" title="Salin">
-                                                <span class="material-symbols-outlined text-lg">content_copy</span>
-                                            </button>
-                                            <button onclick="handleDeleteLog('${log.id}')" class="text-outline hover:text-red-500 transition-colors p-1" title="Hapus">
-                                                <span class="material-symbols-outlined text-lg">delete</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('') : '<p class="text-center text-outline py-20">Belum ada riwayat kegiatan.</p>'}
-                </div>
-            </section>
-        `;
-    },
     laporan: () => {
         const filteredLogs = getFilteredLogs();
         let currentDate = null;
@@ -368,7 +307,7 @@ const templates = {
                                     <th>Detail Kegiatan</th>
                                     <th class="w-32">Lokasi</th>
                                     <th class="w-20">Foto</th>
-                                    <th class="w-16">Aksi</th>
+                                    <th class="w-16 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -406,9 +345,14 @@ const templates = {
                                                 ` : '<span class="text-outline text-[10px] opacity-30 italic">No Photo</span>'}
                                             </td>
                                             <td class="text-center">
-                                                <button onclick="handleDeleteLog('${log.id}')" class="text-outline hover:text-red-500 transition-colors active:scale-90" title="Hapus">
-                                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                                </button>
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <button onclick="handleEditLog('${log.id}')" class="text-outline hover:text-primary transition-all active:scale-90" title="Edit">
+                                                        <span class="material-symbols-outlined text-lg">edit</span>
+                                                    </button>
+                                                    <button onclick="handleDeleteLog('${log.id}')" class="text-outline hover:text-red-500 transition-all active:scale-90" title="Hapus">
+                                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     `;
@@ -446,9 +390,14 @@ function getIconForCategory(cat) {
     return 'list_alt';
 }
 
-let viewOrder = ['dashboard', 'riwayat', 'laporan', 'input'];
+let viewOrder = ['dashboard', 'laporan', 'input'];
 
 function navigate(view) {
+    // Reset Edit Mode when navigating
+    if (view !== 'input') {
+        isEditMode = false;
+        editingLogId = null;
+    }
     const oldIndex = viewOrder.indexOf(currentView);
     const newIndex = viewOrder.indexOf(view);
     const direction = newIndex > oldIndex ? 'slide-in-right' : 'slide-in-left';
@@ -521,8 +470,6 @@ async function handleAddLog(e) {
             photoUrl = data.secure_url;
         }
 
-        submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Menyimpan Jurnal...</span>';
-
         const newLog = {
             date,
             time,
@@ -533,10 +480,23 @@ async function handleAddLog(e) {
             createdAt: new Date().toISOString()
         };
 
-        const docRef = await addDoc(logsCollection, newLog);
-        logs.unshift({ id: docRef.id, ...newLog });
+        if (isEditMode) {
+            submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Memperbarui...</span>';
+            const logRef = doc(db, "logs", editingLogId);
+            await updateDoc(logRef, newLog);
+            
+            // Update local state
+            const index = logs.findIndex(l => l.id === editingLogId);
+            if (index !== -1) logs[index] = { id: editingLogId, ...newLog };
+            
+            showToast('Kegiatan diperbarui!');
+        } else {
+            submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Menyimpan...</span>';
+            const docRef = await addDoc(logsCollection, newLog);
+            logs.unshift({ id: docRef.id, ...newLog });
+            showToast('Kegiatan berhasil dicatat!');
+        }
         
-        showToast('Kegiatan berhasil dicatat!');
         navigate('dashboard');
     } catch (error) {
         console.error("Error adding document: ", error);
@@ -765,12 +725,41 @@ async function handleDeleteLog(id) {
     }
 }
 
+async function handleEditLog(id) {
+    const log = logs.find(l => l.id === id);
+    if (!log) return;
+
+    isEditMode = true;
+    editingLogId = id;
+    
+    navigate('input');
+    
+    // Fill the form after navigation (template rendering)
+    setTimeout(() => {
+        document.getElementById('input-date').value = log.date;
+        document.getElementById('input-time').value = log.time;
+        document.getElementById('input-category').value = log.category;
+        document.getElementById('input-location').value = log.location || "";
+        document.getElementById('input-description').value = log.description;
+        
+        if (log.photoUrl) {
+            const preview = document.getElementById('photo-preview');
+            const container = document.getElementById('photo-preview-container');
+            const placeholder = document.getElementById('upload-placeholder');
+            if (preview) preview.src = log.photoUrl;
+            if (container) container.classList.remove('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+        }
+    }, 100);
+}
+
 // Expose functions to window
 window.applyFilter = applyFilter;
 window.openCustomRange = openCustomRange;
 window.updateCustomRange = updateCustomRange;
 window.exportToExcel = exportToExcel;
 window.handleDeleteLog = handleDeleteLog;
+window.handleEditLog = handleEditLog;
 
 // Initialize first view & fetch data
 navigate('dashboard');

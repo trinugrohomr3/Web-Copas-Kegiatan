@@ -163,8 +163,65 @@ input[type="file"]::file-selector-button {
     font-weight: 600;
 }
 
-.report-table tr:hover {
-    background: #F1F5F9/30;
+.report-table tr:hover td {
+    background: rgba(241, 245, 249, 0.5);
+}
+
+/* Responsive Desktop Overhaul */
+@media (min-width: 1024px) {
+    body {
+        padding-bottom: 0;
+    }
+    
+    nav {
+        top: 0;
+        bottom: auto !important;
+        border-top: none !important;
+        border-bottom: 1px solid var(--surface-container) !important;
+        border-radius: 0 !important;
+        padding-bottom: 0.5rem !important;
+        padding-top: 0.5rem !important;
+        height: 72px;
+        justify-content: center !important;
+        gap: 4rem;
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* Hide the mobile header when nav is at top */
+    header {
+        display: none;
+    }
+
+    main {
+        padding-top: 100px !important;
+        max-width: 1200px !important;
+    }
+
+    .nav-item {
+        flex-direction: row !important;
+        gap: 12px;
+        padding: 10px 20px;
+    }
+
+    .nav-item span:last-child {
+        font-size: 11px !important;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
 }
 
 /* Filter Bar Styles */
