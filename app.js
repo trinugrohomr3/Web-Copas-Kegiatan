@@ -233,7 +233,7 @@ const templates = {
                     <!-- Photo Upload Section -->
                     <div class="space-y-1.5 pt-2">
                         <label class="text-[10px] font-bold text-outline uppercase tracking-widest px-1">Lampiran Foto (Opsional)</label>
-                        <div class="relative bg-white border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:border-primary transition-all cursor-pointer group" onclick="document.getElementById('input-photo').click()">
+                        <label for="input-photo" class="block relative bg-white border-2 border-dashed border-slate-200 rounded-2xl p-4 hover:border-primary transition-all cursor-pointer group">
                             <input type="file" id="input-photo" accept="image/*" class="hidden" onchange="window.handlePhotoPreview(event)"/>
                             
                             <div id="photo-preview-container" class="hidden w-full aspect-video rounded-xl overflow-hidden border border-slate-100 mb-2 relative">
@@ -249,7 +249,7 @@ const templates = {
                                 </div>
                                 <span class="text-[10px] font-black uppercase tracking-widest">Pilih atau Ambil Foto</span>
                             </div>
-                        </div>
+                        </label>
                     </div>
                 </div>
 
