@@ -32,6 +32,21 @@ let isEditMode = false;
 let editingLogId = null;
 let currentModalImageUrl = '';
 
+const QUOTES = [
+    "Pekerjaan hebat tidak dilakukan dengan kekuatan, tapi dengan ketekunan.",
+    "Jangan menunggu kesempatan, ciptakanlah.",
+    "Masa depan hanyalah milik mereka yang percaya pada keindahan mimpi mereka.",
+    "Kedisiplinan adalah jembatan antara cita-cita dan pencapaian.",
+    "Sukses adalah jumlah dari upaya kecil yang diulangi hari demi hari.",
+    "Kerja keras bukan untuk menjadi yang terbaik, tapi untuk memberikan yang terbaik.",
+    "Fokuslah pada progres, bukan pada kesempurnaan.",
+    "Setiap langkah kecil membawamu lebih dekat ke tujuan besar."
+];
+
+function getRandomQuote() {
+    return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+}
+
 // --- Utilities ---
 async function fetchLogs() {
     try {
@@ -161,6 +176,22 @@ const templates = {
                                     </div>
                                 </div>
                             `).join('') : '<p class="text-center text-outline py-8 text-sm italic col-span-full">Belum ada data...</p>'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quote Section -->
+                <div class="premium-card p-6 rounded-[2rem] bg-gradient-to-r from-slate-50 to-white border-l-4 border-l-primary-dim/30 mt-8 mb-4">
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined text-primary-dim/20 text-4xl select-none">format_quote</span>
+                        <div>
+                            <blockquote class="font-headline font-bold text-on-surface leading-relaxed italic text-sm md:text-base">
+                                "${getRandomQuote()}"
+                            </blockquote>
+                            <p class="text-[10px] font-bold text-outline uppercase tracking-widest mt-3 flex items-center gap-2">
+                                <span class="w-4 h-[1px] bg-outline/30"></span>
+                                Inspirasi Penggerak Hari Ini
+                            </p>
                         </div>
                     </div>
                 </div>
